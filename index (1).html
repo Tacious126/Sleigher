@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sleigher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+  :root{--bg:#0d1b2a;--bg2:#13263b;--card:#fdf8f0;--ink:#1d1d1d;--muted:#6b6b6b;--red:#c8102e;--red2:#9e0b23;--green:#1f7a4d;--gold:#f2c14e;--snow:#fff}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at top,#1d3557 0%,var(--bg) 60%);color:var(--snow);font-family:Nunito,system-ui,sans-serif}
+  body{min-height:100vh;overflow-x:hidden}
+  .snow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .snow i{position:absolute;top:-10px;border-radius:50%;background:#fff;opacity:.7;animation:fall linear infinite}
+  @keyframes fall{to{transform:translateY(110vh) translateX(30px)}}
+  .wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:18px 16px 60px}
+  header{text-align:center;margin:6px 0 14px}
+  h1{font-family:"Mountains of Christmas",cursive;font-size:56px;line-height:1;margin:0;text-shadow:0 3px 0 var(--red),0 6px 18px rgba(0,0,0,.5);letter-spacing:1px}
+  .tag{color:var(--gold);font-weight:700;font-size:14px;margin-top:6px}
+  .card{background:var(--card);color:var(--ink);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 8px 24px rgba(0,0,0,.35);border-top:6px solid var(--red)}
+  .card.green{border-top-color:var(--green)} .card.gold{border-top-color:var(--gold)}
+  h2{margin:0 0 8px;font-size:20px;font-weight:900}
+  p{margin:6px 0;line-height:1.45}
+  .muted{color:var(--muted);font-size:14px}
+  label{font-weight:700;font-size:14px;display:block;margin:10px 0 6px}
+  input[type=text],textarea{width:100%;font:inherit;font-size:18px;padding:12px 14px;border-radius:12px;border:2px solid #d9d2c5;background:#fff;color:var(--ink)}
+  input.code{text-transform:uppercase;letter-spacing:8px;font-weight:900;text-align:center;font-size:26px}
+  textarea{font-size:15px;min-height:180px}
+  input:focus,textarea:focus{outline:none;border-color:var(--green)}
+  button{font:inherit;font-weight:900;font-size:17px;border:0;border-radius:14px;padding:14px 18px;cursor:pointer;width:100%;margin-top:10px;background:var(--red);color:#fff;box-shadow:0 4px 0 var(--red2)}
+  button:active{transform:translateY(2px);box-shadow:0 2px 0 var(--red2)}
+  button.green{background:var(--green);box-shadow:0 4px 0 #145236}
+  button.ghost{background:#ece5d8;color:var(--ink);box-shadow:0 4px 0 #cfc6b5}
+  button.small{width:auto;padding:8px 12px;font-size:14px;margin:0}
+  button:disabled{opacity:.5}
+  .check{display:flex;gap:10px;align-items:center;font-weight:700;margin-top:12px}
+  .check input{width:22px;height:22px}
+  ul.list{list-style:none;padding:0;margin:8px 0 0}
+  ul.list li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px dashed #ddd3c1;font-weight:700}
+  ul.list li:last-child{border-bottom:0}
+  .pill{display:inline-block;font-size:12px;font-weight:900;padding:3px 9px;border-radius:99px;background:#e6f2ea;color:var(--green)}
+  .reveal{background:linear-gradient(135deg,var(--red),#7a0a1c);color:#fff;border-radius:18px;padding:22px 18px;text-align:center;margin:14px 0;box-shadow:0 8px 24px rgba(0,0,0,.4);user-select:none;-webkit-user-select:none;cursor:pointer;min-height:190px;display:flex;flex-direction:column;justify-content:center}
+  .reveal .lbl{text-transform:uppercase;letter-spacing:2px;font-size:12px;opacity:.85;font-weight:900}
+  .reveal .big{font-size:34px;font-weight:900;margin:4px 0 14px}
+  .reveal .task{font-size:20px;font-weight:700;background:rgba(255,255,255,.14);border-radius:12px;padding:12px}
+  .reveal.hidden .big,.reveal.hidden .task{filter:blur(14px)}
+  .stats{display:flex;gap:10px;margin:10px 0}
+  .stat{flex:1;background:var(--bg2);border:1px solid #2c4664;border-radius:14px;padding:10px;text-align:center}
+  .stat b{display:block;font-size:26px;color:var(--gold)} .stat span{font-size:12px;color:#c6d3e1}
+  .feed{list-style:none;padding:0;margin:6px 0 0;font-size:15px}
+  .feed li{padding:7px 0;border-bottom:1px dashed #ddd3c1} .feed li:last-child{border-bottom:0}
+  .feed time{color:var(--muted);font-size:12px;margin-right:6px}
+  .overlay{position:fixed;inset:0;background:rgba(5,12,20,.85);z-index:10;display:flex;align-items:center;justify-content:center;padding:18px}
+  .overlay .card{max-width:440px;width:100%;border-top-color:var(--gold)}
+  .qr{background:#fff;border-radius:14px;padding:12px;display:flex;justify-content:center}
+  .qr svg{width:100%;max-width:260px;height:auto}
+  .bigcode{font-size:52px;font-weight:900;letter-spacing:10px;text-align:center;color:var(--red);margin:4px 0}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#111;color:#fff;padding:12px 16px;border-radius:12px;font-weight:700;z-index:20;max-width:90vw;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+  .tabs{display:flex;gap:8px;margin:0 0 6px} .tabs button{margin:0;padding:10px;font-size:15px}
+  .tabs button.off{background:var(--bg2);color:#c6d3e1;box-shadow:0 4px 0 #0a1520}
+  .winner{font-family:"Mountains of Christmas",cursive;font-size:44px;color:var(--red);text-align:center;margin:6px 0}
+  .center{text-align:center} .peek li{font-weight:400} .peek b{font-weight:900}
+  details summary{cursor:pointer;font-weight:900}
+  .roombar{display:flex;justify-content:space-between;align-items:center;color:#c6d3e1;font-size:14px;margin-bottom:4px}
+  .roombar b{color:var(--gold);letter-spacing:3px}
+  .roombar a{color:#c6d3e1}
+</style>
+</head>
+<body>
+<div class="snow" id="snow"></div>
+<div class="wrap">
+  <header>
+    <h1>Sleigher</h1>
+    <div class="tag">Get your target to do the task. Sleigh them. Be the last elf standing.</div>
+  </header>
+  <div id="bar"></div>
+  <div id="tabs"></div>
+  <div id="app"><div class="card"><p>Loading…</p></div></div>
+</div>
+<div id="overlay"></div>
+<div id="toast"></div>
+
+<script type="module">
+// =====================================================================
+// 1) PASTE YOUR FIREBASE CONFIG HERE (Firebase console > Project settings > Your apps > Web app)
+//    Make sure it includes databaseURL.
+// =====================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBgTbcFC9N_CvKIUCm35qsITD-Pd-QpkAQ",
+  authDomain: "sleigher-3d782.firebaseapp.com",
+  databaseURL: "https://sleigher-3d782-default-rtdb.firebaseio.com",
+  projectId: "sleigher-3d782",
+  appId: "1:482945021757:web:2ae27ffd3bcb0e6dc9f754"
+};
+// =====================================================================
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, runTransaction, off } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const DEFAULT_TASKS = [
+  "Get them to say \"Merry Christmas\" to you",
+  "Get them to hand you a cookie or a piece of candy",
+  "Get them to take a selfie with you",
+  "Get them to tell you their favorite Christmas movie",
+  "Get them to say the word \"reindeer\"",
+  "Get them to hold your drink for you",
+  "Get them to compliment your outfit",
+  "Get them to give you a high five",
+  "Get them to say \"ho ho ho\"",
+  "Get them to pass you a napkin",
+  "Get them to tell you what time it is",
+  "Get them to name at least three of Santa's reindeer",
+  "Get them to say the word \"snow\"",
+  "Get them to put on something of yours (hat, scarf, glasses)",
+  "Get them to fist-bump you",
+  "Get them to tell you a joke",
+  "Get them to point at the Christmas tree",
+  "Get them to say \"naughty list\"",
+  "Get them to hum or sing any Christmas song",
+  "Get them to spell \"Christmas\" out loud",
+  "Get them to tell you what they want for Christmas",
+  "Get them to sit down next to you",
+  "Get them to open a door for you",
+  "Get them to shake your hand",
+  "Get them to say your name three times in one conversation"
+];
+const CODE_LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ"; // no I or O
+
+// ---------- snow ----------
+(()=>{const s=document.getElementById('snow');for(let i=0;i<40;i++){const f=document.createElement('i');const z=2+Math.random()*5;f.style.left=Math.random()*100+'%';f.style.width=f.style.height=z+'px';f.style.animationDuration=(6+Math.random()*10)+'s';f.style.animationDelay=(-Math.random()*15)+'s';s.appendChild(f)}})();
+
+// ---------- helpers ----------
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+const clean=s=>String(s||'').replace(/[\u0000-\u001f]/g,'').trim().slice(0,24);
+const normCode=s=>String(s||'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,4);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function toast(msg,ms){const t=document.getElementById('toast');t.innerHTML='<div class="toast">'+esc(msg)+'</div>';clearTimeout(toast._t);toast._t=setTimeout(()=>t.innerHTML='',ms||3200)}
+const timeStr=t=>new Date(t).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+
+// ---------- app state ----------
+let me = store.get('sleigher_pid'); if(!me){ me='p'+rid(); store.set('sleigher_pid',me); }
+let db=null, code=null, room=null, roomRef=null, loaded=false;
+let view='play', revealed=false, revealTimer=null, peek=false;
+const players=()=> (room && room.players) || {};
+const nameOf=id=>id==='gm'?'the Game Master':(players()[id]&&players()[id].name)||'Someone';
+const isHost=()=>!!(room && room.host===me);
+
+const configured = !String(firebaseConfig.databaseURL||'').includes('PASTE');
+if(configured){
+  try{ db=getDatabase(initializeApp(firebaseConfig)); }catch(e){ console.error(e); }
+}
+
+// ---------- rooms ----------
+function openRoom(c){
+  if(roomRef) off(roomRef);
+  code=c; room=null; loaded=false; roomRef=ref(db,'rooms/'+c);
+  store.set('sleigher_room',c);
+  if(location.hash!=='#'+c) history.replaceState(null,'','#'+c);
+  onValue(roomRef, snap=>{
+    room=snap.val(); loaded=true;
+    if(!room){ toast("That room doesn't exist anymore."); leaveRoomLocal(); return; }
+    if(isHost() && view==='play' && !openRoom.tabSet){ view='gm'; }
+    openRoom.tabSet=true;
+    render();
+  }, err=>{ console.error(err); toast("Couldn't reach the game. Check your connection."); });
+}
+function leaveRoomLocal(){
+  if(roomRef) off(roomRef);
+  roomRef=null; room=null; code=null; loaded=false; openRoom.tabSet=false; view='play';
+  store.del('sleigher_room'); history.replaceState(null,'',location.pathname+location.search);
+  render();
+}
+
+// Run a change on the whole room atomically. fn returns false to cancel.
+async function mutate(fn){
+  let why=null;
+  const res=await runTransaction(roomRef, r=>{
+    if(r===null) return null;           // not loaded yet; Firebase retries with real data
+    why=null; const out=fn(r, m=>{why=m});
+    return out===false ? undefined : r;
+  });
+  if(!res.committed && why) toast(why);
+  return res.committed;
+}
+
+async function createRoom(hostName, playing){
+  for(let tries=0;tries<8;tries++){
+    const c=Array.from({length:4},()=>CODE_LETTERS[Math.floor(Math.random()*CODE_LETTERS.length)]).join('');
+    const r=ref(db,'rooms/'+c);
+    const res=await runTransaction(r, cur=>{
+      if(cur!==null) return; // taken, try another code
+      const room={host:me,status:'lobby',tasks:DEFAULT_TASKS,createdAt:Date.now(),players:{}};
+      if(playing) room.players[me]={name:hostName,joinedAt:Date.now(),alive:true,sleighs:0};
+      return room;
+    });
+    if(res.committed){ openRoom(c); return; }
+  }
+  toast("Couldn't make a room. Try again.");
+}
+
+async function joinRoom(c, name){
+  const r=ref(db,'rooms/'+c);
+  let why=null;
+  const res=await runTransaction(r, cur=>{
+    if(cur===null) return null;
+    why=null;
+    cur.players=cur.players||{};
+    if(cur.players[me]){ if(cur.status==='lobby') cur.players[me].name=name; return cur; }
+    if(cur.status!=='lobby'){ why="That game already started. Wait for the next round."; return; }
+    if(Object.values(cur.players).some(p=>p.name.toLowerCase()===name.toLowerCase())){ why="Someone already has that name. Add an initial."; return; }
+    cur.players[me]={name,joinedAt:Date.now(),alive:true,sleighs:0};
+    return cur;
+  });
+  if(res.committed && res.snapshot.exists()){ openRoom(c); return; }
+  toast(why || "No game with that code. Double-check it.");
+}
+
+// ---------- game logic ----------
+function pushFeed(r,text){ r.feed=[{t:Date.now(),text}].concat(r.feed||[]).slice(0,30); }
+function eliminate(r, vid, hid, credit){
+  const P=r.players, v=P[vid], h=P[hid];
+  v.alive=false; v.outBy=credit?hid:'gm'; v.outAt=Date.now(); v.pendingBy=null; v.pendingAt=null;
+  h.target=v.target; h.task=v.task; if(credit) h.sleighs=(h.sleighs||0)+1;
+  const text=credit?(h.name+' sleighed '+v.name+'!'):(v.name+' left the game.');
+  if(h.target===hid){ r.status='over'; r.winner=hid; r.endedAt=Date.now(); pushFeed(r,text+' '+h.name+' is the last one standing!'); }
+  else pushFeed(r,text);
+}
+const actions={
+  leave:()=>mutate((r,no)=>{ if(r.status!=='lobby'||!r.players||!r.players[me]) return false; delete r.players[me]; }),
+  claim:()=>mutate((r,no)=>{
+    const P=r.players||{}, h=P[me]; if(r.status!=='active'||!h||!h.alive||!h.target) return false;
+    const v=P[h.target]; if(!v||!v.alive) return false;
+    if(v.pendingBy===me) return false;
+    if(v.pendingBy){ no("Hang on, "+v.name+" is answering another request."); return false; }
+    v.pendingBy=me; v.pendingAt=Date.now();
+  }),
+  deny:(pa)=>mutate((r)=>{
+    const v=(r.players||{})[me]; if(!v||v.pendingAt!==pa) return false;
+    v.deniedBy=v.pendingBy; v.deniedAt=Date.now(); v.pendingBy=null; v.pendingAt=null;
+  }),
+  confirm:(pa)=>mutate((r)=>{
+    const P=r.players||{}, v=P[me]; if(r.status!=='active'||!v||!v.alive||!v.pendingBy||v.pendingAt!==pa) return false;
+    const hid=v.pendingBy, h=P[hid];
+    if(!h||!h.alive||h.target!==me){ v.pendingBy=null; v.pendingAt=null; return; }
+    eliminate(r, me, hid, true);
+  })
+};
+const gm={
+  start:()=>mutate((r,no)=>{
+    const ids=Object.keys(r.players||{});
+    if(ids.length<3){ no("Need at least 3 players to start."); return false; }
+    const order=shuffle(ids), tasks=shuffle(r.tasks&&r.tasks.length?r.tasks:DEFAULT_TASKS);
+    order.forEach((id,i)=>{ const p=r.players[id]; Object.assign(p,{alive:true,target:order[(i+1)%order.length],task:tasks[i%tasks.length],sleighs:0,outBy:null,outAt:null,pendingBy:null,pendingAt:null,deniedBy:null,deniedAt:null}); });
+    r.status='active'; r.startedAt=Date.now(); r.winner=null; r.feed=[]; pushFeed(r,'The game has begun with '+order.length+' players. Happy hunting!');
+  }),
+  remove:(pid,credit)=>mutate((r)=>{
+    const P=r.players||{}; if(!P[pid]) return false;
+    if(r.status==='lobby'){ delete P[pid]; return; }
+    if(!P[pid].alive) return false;
+    const hid=Object.keys(P).find(id=>P[id].alive && P[id].target===pid);
+    if(!hid){ P[pid].alive=false; P[pid].outBy='gm'; return; }
+    eliminate(r,pid,hid,credit);
+  }),
+  newRound:()=>mutate((r)=>{
+    for(const p of Object.values(r.players||{})) Object.assign(p,{alive:true,target:null,task:null,sleighs:0,outBy:null,outAt:null,pendingBy:null,pendingAt:null,deniedBy:null,deniedAt:null});
+    r.status='lobby'; r.winner=null; r.feed=null;
+  }),
+  clearAll:()=>mutate((r)=>{ r.players=null; r.status='lobby'; r.winner=null; r.feed=null; }),
+  joinSelf:(name)=>mutate((r,no)=>{
+    r.players=r.players||{}; if(r.players[me]||r.status!=='lobby') return false;
+    if(Object.values(r.players).some(p=>p.name.toLowerCase()===name.toLowerCase())){ no("Someone already has that name."); return false; }
+    r.players[me]={name,joinedAt:Date.now(),alive:true,sleighs:0};
+  }),
+  saveTasks:(list)=>mutate((r)=>{ r.tasks=list; })
+};
+
+// ---------- rendering ----------
+function setHTML(id, html){
+  const el=document.getElementById(id);
+  if(el._last===html) return;
+  const a=document.activeElement; let keep=null;
+  if(a && a.id && el.contains(a)) keep={id:a.id,v:a.value,s:a.selectionStart,e:a.selectionEnd};
+  el.innerHTML=html; el._last=html;
+  if(keep){ const n=document.getElementById(keep.id); if(n){ n.value=keep.v; n.focus(); try{n.setSelectionRange(keep.s,keep.e)}catch(e){} } }
+}
+
+function render(){
+  if(!configured || !db){
+    setHTML('bar',''); setHTML('tabs','');
+    setHTML('app', `<div class="card"><h2>Almost ready</h2><p>Paste your Firebase config into the top of this file, then reload.</p></div>`);
+    return;
+  }
+  if(!code){ setHTML('bar',''); setHTML('tabs',''); setHTML('overlay',''); setHTML('app', renderHome()); return; }
+  setHTML('bar', `<div class="roombar"><span>Room <b>${esc(code)}</b></span><a href="#" data-act="exit">Leave room</a></div>`);
+  if(!loaded || !room){ setHTML('tabs',''); setHTML('app', `<div class="card"><p>Joining room ${esc(code)}…</p></div>`); return; }
+  setHTML('tabs', isHost() ? `<div class="tabs"><button class="${view==='gm'?'':'off'}" data-act="tab-gm">Game Master</button><button class="${view==='play'?'':'off'}" data-act="tab-play">My Player</button></div>` : '');
+  setHTML('app', view==='gm' && isHost() ? renderGM() : renderPlayer());
+  setHTML('overlay', renderOverlay());
+}
+
+function renderHome(){
+  const pre=normCode(location.hash.slice(1));
+  return `<div class="card"><h2>Join a game</h2>
+      <label for="jcode">Room code</label>
+      <input type="text" id="jcode" class="code" maxlength="4" placeholder="ABCD" autocomplete="off" autocapitalize="characters" value="${esc(pre)}">
+      <label for="jname">Your name</label>
+      <input type="text" id="jname" maxlength="24" placeholder="e.g. Aunt Linda" autocomplete="off">
+      <button data-act="join">Join</button></div>
+    <div class="card green"><h2>Host a game</h2>
+      <p class="muted">You'll get a room code and a QR code for everyone to scan.</p>
+      <label for="hname">Your name</label>
+      <input type="text" id="hname" maxlength="24" placeholder="Game Master" autocomplete="off">
+      <label class="check"><input type="checkbox" id="hplay" checked> I'm playing too</label>
+      <button class="green" data-act="host">Create room</button></div>
+    ${rulesCard()}`;
+}
+
+const aliveIds=()=>Object.keys(players()).filter(id=>players()[id].alive);
+function statsHTML(){
+  const all=Object.keys(players()).length, alive=aliveIds().length;
+  return `<div class="stats"><div class="stat"><b>${alive}</b><span>still in</span></div><div class="stat"><b>${all-alive}</b><span>sleighed</span></div><div class="stat"><b>${all}</b><span>players</span></div></div>`;
+}
+function feedHTML(){
+  const f=room.feed||[]; if(!f.length) return '';
+  return `<div class="card green"><h2>Sleigh feed</h2><ul class="feed">${f.map(x=>`<li><time>${esc(timeStr(x.t))}</time>${esc(x.text)}</li>`).join('')}</ul></div>`;
+}
+function lobbyList(withRemove){
+  const P=players(), ids=Object.keys(P).sort((a,b)=>(P[a].joinedAt||0)-(P[b].joinedAt||0));
+  if(!ids.length) return `<p class="muted">Nobody yet. Have everyone scan the code.</p>`;
+  return `<ul class="list">${ids.map(id=>`<li><span>${esc(P[id].name)}${id===me?' <span class="pill">you</span>':''}</span>${withRemove?`<button class="small ghost" data-act="gm-remove" data-id="${esc(id)}">Remove</button>`:''}</li>`).join('')}</ul>`;
+}
+function leaderboard(){
+  const P=players(), ids=Object.keys(P).sort((a,b)=>(P[b].sleighs||0)-(P[a].sleighs||0));
+  return `<ul class="list">${ids.map(id=>`<li><span>${esc(P[id].name)}${id===room.winner?' 🏆':''}</span><span class="pill">${P[id].sleighs||0} sleigh${(P[id].sleighs||0)===1?'':'s'}</span></li>`).join('')}</ul>`;
+}
+function rulesCard(){
+  return `<div class="card gold"><details><summary>How to play</summary>
+    <p>Everyone gets a secret target and a secret task.</p>
+    <p>Get your target to do your task without them catching on. When they do it, tap <b>I sleighed them!</b> and they confirm on their phone.</p>
+    <p>You then take over their target and their task. Last one standing wins.</p>
+    <p>No telling anyone your target. Honor system, elves!</p></details></div>`;
+}
+
+function renderPlayer(){
+  const P=players(), mine=P[me];
+  if(room.status==='lobby'){
+    if(!mine){
+      if(isHost()) return `<div class="card"><h2>Play too?</h2><label for="selfname">Your name</label><input type="text" id="selfname" maxlength="24" autocomplete="off"><button data-act="selfjoin">Join as a player</button></div>`;
+      return `<div class="card"><h2>You're not in this room</h2><p>Leave the room and join again with your name.</p></div>`;
+    }
+    return `<div class="card green"><h2>You're in, ${esc(mine.name)}!</h2><p>Hang tight. When everyone has joined, the Game Master will start the game and you'll get your target and task here.</p>
+      ${isHost()?'':'<button class="ghost" data-act="leave">Leave game</button>'}</div>
+      <div class="card"><h2>Who's in (${Object.keys(P).length})</h2>${lobbyList(false)}</div>${rulesCard()}`;
+  }
+  if(room.status==='over'){
+    return `<div class="card gold"><div class="winner">${esc(nameOf(room.winner))} wins!</div><p class="center">Last elf standing${room.winner===me?". That's you!":"."}</p></div>
+      <div class="card"><h2>Final sleigh count</h2>${leaderboard()}</div>${feedHTML()}`;
+  }
+  if(!mine) return `<div class="card"><h2>Game in progress</h2><p>This round already started. Watch the feed and jump in next round.</p></div>${statsHTML()}${feedHTML()}`;
+  if(!mine.alive) return `<div class="card"><h2>You've been sleighed! 🎅</h2><p>${esc(nameOf(mine.outBy))} got you. Your task went to them.</p><p class="muted">You're out, but keep quiet about who's hunting who.</p></div>${statsHTML()}${feedHTML()}`;
+  const t=P[mine.target];
+  const waiting=t && t.pendingBy===me;
+  const denied=t && t.deniedBy===me && t.deniedAt && (Date.now()-t.deniedAt<120000);
+  return `${statsHTML()}
+    <div class="reveal ${revealed?'':'hidden'}" data-act="reveal">
+      <div class="lbl">Your target</div><div class="big">${esc(t?t.name:'…')}</div>
+      <div class="lbl">Your task</div><div class="task">${esc(mine.task||'')}</div>
+      <p style="color:#ffd9de;margin-top:12px;font-size:14px">${revealed?'Tap to hide':'Tap to reveal (keep it secret!)'}</p>
+    </div>
+    <div class="card">
+      ${waiting?`<h2>Waiting on ${esc(t.name)}…</h2><p>They need to confirm on their phone that you got them.</p>`
+        :`<h2>Did they do it?</h2><p>Once ${t?esc(t.name):'your target'} does the task, tap below. They'll confirm on their phone.</p>
+          ${denied?`<p style="color:var(--red);font-weight:700">${esc(t.name)} said it didn't count. Keep trying!</p>`:''}
+          <button class="green" data-act="claim">I sleighed them!</button>`}
+    </div>
+    <div class="card"><h2>Your sleighs: ${mine.sleighs||0}</h2><p class="muted">Get sleighed and your hunter takes your target and task.</p></div>
+    ${feedHTML()}`;
+}
+
+function renderOverlay(){
+  const mine=players()[me];
+  if(!room || room.status!=='active' || !mine || !mine.alive || !mine.pendingBy) return '';
+  const h=players()[mine.pendingBy];
+  return `<div class="overlay"><div class="card">
+    <h2>Were you sleighed? 🛷</h2>
+    <p><b>${esc(h?h.name:'Someone')}</b> says they got you. Their task was:</p>
+    <p style="font-size:18px;font-weight:700;background:#f3ecdf;border-radius:12px;padding:12px">${esc(h?h.task:'')}</p>
+    <p class="muted">Did you actually do it? Be honest!</p>
+    <button data-act="confirm">Yes, I've been sleighed</button>
+    <button class="ghost" data-act="deny">No, that didn't happen</button></div></div>`;
+}
+
+function qrHTML(){
+  if(typeof qrcode!=='function') return '';
+  try{ const q=qrcode(0,'M'); q.addData(location.origin+location.pathname+'#'+code); q.make(); return `<div class="qr">${q.createSvgTag({cellSize:6,margin:2,scalable:true})}</div>`; }catch(e){ return ''; }
+}
+
+function renderGM(){
+  const P=players(), ids=Object.keys(P);
+  if(room.status==='lobby'){
+    const tasks=room.tasks||DEFAULT_TASKS;
+    return `<div class="card gold"><h2 class="center">Room code</h2><div class="bigcode">${esc(code)}</div>${qrHTML()}
+        <p class="muted center" style="margin-top:10px">Scan the QR, or go to this site and type the code.</p></div>
+      <div class="card green"><h2>Players (${ids.length})</h2>${lobbyList(true)}
+        <button data-act="gm-start" ${ids.length<3?'disabled':''}>Start the game</button>
+        ${ids.length<3?'<p class="muted">Need at least 3 players.</p>':''}</div>
+      <div class="card"><details><summary>Edit tasks (${tasks.length})</summary>
+        <p class="muted">One per line. Each player gets one at random.</p>
+        <textarea id="tasks">${esc(tasks.join('\n'))}</textarea>
+        <button class="green" data-act="gm-tasks">Save tasks</button></details></div>
+      ${ids.length?`<div class="card"><button class="ghost" data-act="gm-clear">Remove everyone</button></div>`:''}`;
+  }
+  if(room.status==='over'){
+    return `<div class="card gold"><div class="winner">${esc(nameOf(room.winner))} wins!</div></div>
+      <div class="card"><h2>Final sleigh count</h2>${leaderboard()}
+        <button class="green" data-act="gm-round">New round, same players</button>
+        <button class="ghost" data-act="gm-clear">Start fresh (remove everyone)</button></div>${feedHTML()}`;
+  }
+  const alive=aliveIds(), order=[];
+  if(alive.length){ let cur=alive[0]; const seen=new Set(); while(cur && !seen.has(cur) && P[cur]){ seen.add(cur); order.push(cur); cur=P[cur].target; } }
+  const out=ids.filter(id=>!P[id].alive);
+  const peekHTML=peek?`<ul class="list peek">${order.map(id=>`<li><span><b>${esc(P[id].name)}</b> → ${esc(nameOf(P[id].target))}<br><span class="muted">${esc(P[id].task)}</span>${P[id].pendingBy?'<br><span class="pill">waiting to confirm</span>':''}</span>
+      <span style="display:flex;flex-direction:column;gap:6px"><button class="small" data-act="gm-sleigh" data-id="${esc(id)}">Sleighed</button><button class="small ghost" data-act="gm-left" data-id="${esc(id)}">Left</button></span></li>`).join('')}</ul>
+      <p class="muted">"Sleighed" counts it for their hunter (use it if someone's phone died). "Left" removes a player without credit; their hunter still takes over their target.</p>`:'';
+  return `${statsHTML()}
+    <div class="card green"><h2>Game on</h2>
+      <p><b>Still in:</b> ${alive.map(id=>esc(P[id].name)).join(', ')||'nobody'}</p>
+      ${out.length?`<p><b>Sleighed:</b> ${out.map(id=>esc(P[id].name)).join(', ')}</p>`:''}</div>
+    <div class="card"><h2>Referee tools</h2>
+      <button class="ghost" data-act="gm-peek">${peek?'Hide':'Show'} all targets and tasks</button>
+      ${peek?'<p class="muted">Spoilers! Only peek if you need to settle something.</p>':''}${peekHTML}
+      <button class="ghost" data-act="gm-round">End game and go back to the lobby</button></div>
+    ${feedHTML()}`;
+}
+
+// ---------- events ----------
+document.addEventListener('click', async ev=>{
+  const b=ev.target.closest('[data-act]'); if(!b) return;
+  const a=b.dataset.act, id=b.dataset.id;
+  if(b.tagName==='A') ev.preventDefault();
+  if(b.tagName==='BUTTON' && b.disabled) return;
+  const busy=fn=>{ if(b.tagName==='BUTTON') b.disabled=true; return Promise.resolve().then(fn).catch(e=>{console.error(e);toast("Something went wrong. Try again.")}).finally(()=>{ if(b.isConnected&&b.tagName==='BUTTON') b.disabled=false; }); };
+  const mine=players()[me];
+  switch(a){
+    case 'join': {
+      const c=normCode(document.getElementById('jcode').value), n=clean(document.getElementById('jname').value);
+      if(c.length!==4){ toast("Room codes are 4 letters."); return; }
+      if(!n){ toast("Type your name."); return; }
+      await busy(()=>joinRoom(c,n)); break; }
+    case 'host': {
+      const n=clean(document.getElementById('hname').value), playing=document.getElementById('hplay').checked;
+      if(playing && !n){ toast("Type your name, or uncheck \"I'm playing too\"."); return; }
+      await busy(()=>createRoom(n||'Game Master',playing)); break; }
+    case 'exit': if(isHost() && room && room.status==='active' && !window.confirmExit){ window.confirmExit=true; toast("You're the Game Master. Tap Leave room again to leave anyway.",4000); setTimeout(()=>window.confirmExit=false,4000); return; } leaveRoomLocal(); break;
+    case 'tab-gm': view='gm'; render(); break;
+    case 'tab-play': view='play'; render(); break;
+    case 'reveal': revealed=!revealed; clearTimeout(revealTimer); if(revealed) revealTimer=setTimeout(()=>{revealed=false;render()},8000); render(); break;
+    case 'leave': await busy(async()=>{ if(await actions.leave()) leaveRoomLocal(); }); break;
+    case 'claim': await busy(actions.claim); break;
+    case 'confirm': await busy(()=>actions.confirm(mine&&mine.pendingAt)); break;
+    case 'deny': await busy(()=>actions.deny(mine&&mine.pendingAt)); break;
+    case 'selfjoin': { const n=clean(document.getElementById('selfname').value); if(!n){toast("Type your name.");return;} await busy(()=>gm.joinSelf(n)); break; }
+    case 'gm-start': await busy(gm.start); break;
+    case 'gm-remove': await busy(()=>gm.remove(id,false)); break;
+    case 'gm-sleigh': await busy(()=>gm.remove(id,true)); break;
+    case 'gm-left': await busy(()=>gm.remove(id,false)); break;
+    case 'gm-peek': peek=!peek; render(); break;
+    case 'gm-round': await busy(gm.newRound); break;
+    case 'gm-clear': await busy(gm.clearAll); break;
+    case 'gm-tasks': {
+      const list=document.getElementById('tasks').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,200);
+      if(!list.length){ toast("Add at least one task."); return; }
+      await busy(async()=>{ if(await gm.saveTasks(list)) toast("Tasks saved ("+list.length+")."); }); break; }
+  }
+});
+document.addEventListener('keydown', ev=>{
+  if(ev.key!=='Enter' || !ev.target) return;
+  if(ev.target.id==='jname'||ev.target.id==='jcode'){ const b=document.querySelector('[data-act="join"]'); if(b) b.click(); }
+  if(ev.target.id==='hname'){ const b=document.querySelector('[data-act="host"]'); if(b) b.click(); }
+});
+document.addEventListener('input', ev=>{ if(ev.target && ev.target.id==='jcode') ev.target.value=normCode(ev.target.value); });
+setInterval(()=>{ if(room && room.status==='active') { const el=document.getElementById('app'); el._last=null; render(); } }, 30000); // refresh "didn't count" note
+
+// ---------- start ----------
+if(db){
+  const fromHash=normCode(location.hash.slice(1)), saved=store.get('sleigher_room');
+  if(saved && (!fromHash || fromHash===saved)) openRoom(saved);
+}
+render();
+</script>
+</body>
+</html>
